@@ -1,0 +1,16 @@
+{
+    "name": "nterc721",
+    "version": "0.1.0",
+    "homepage": "https://github.com/tksohishi/NTERC721",
+    "license": "MIT",
+    "author": "Takeshi Ohishi",
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+        "dotenv": "^16.0.3",
+        "hardhat": "^2.14.0"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.8.3",
+        "commander": "^10.0.1"
+    }
+}
