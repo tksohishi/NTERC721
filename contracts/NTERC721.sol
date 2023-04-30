@@ -97,7 +97,7 @@ contract NonTransferrableERC721 is ERC721URIStorage, Ownable {
         return string(abi.encodePacked(super.tokenURI(tokenId), ".json"));
     }
 
-    function setBaseURI(string memory baseURI_) public {
+    function setBaseURI(string memory baseURI_) public onlyOwner {
         baseURI = baseURI_;
     }
 

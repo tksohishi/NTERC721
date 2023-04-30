@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("DrillNFT", function () {
+describe("NTERC721 Test", function () {
     let Contract, contract, owner, addr1, addr2;
     const merkleRoot =
         "0x2b6c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918736";
@@ -92,4 +92,34 @@ describe("DrillNFT", function () {
             );
         });
     });
+
+    describe("setMerkleRoot function", () => {
+        const anotherMerkleRoot = "0x2b6c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918700";
+
+        it("should set a merkle root if it's the contract owner", async () => {
+            await contract.setMerkleRoot(anotherMerkleRoot);
+        });
+
+        it("should not set a merkle root if it's not the contract owner", async () => {
+            await expect(
+                contract.connect(addr1).setMerkleRoot(anotherMerkleRoot)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+    });
+
+    describe("setBaseUri function", () => {
+        const anotherBaseUri = "https://example.com/metadata/";
+
+        it("should set a base URI if it's the contract owner", async () => {
+            await contract.setBaseURI(anotherBaseUri);
+            expect(await contract.tokenURI(1)).to.equal("https://example.com/metadata/1.json");
+        });
+
+        it("should not set a base URI if it's the contract owner", async () => {
+            await expect(
+                contract.connect(addr1).setBaseURI(anotherBaseUri)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+    });
+
 });
