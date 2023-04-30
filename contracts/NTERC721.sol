@@ -8,22 +8,24 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 contract NonTransferrableERC721 is ERC721URIStorage, Ownable {
     string public baseURI;
     bytes32 public merkleRoot;
+    uint256 public mintPrice;
     uint256 private _currentTokenId = 0;
 
     constructor(
         string memory name_,
         string memory symbol_,
         bytes32 merkleRoot_,
-        string memory baseURI_
+        string memory baseURI_,
+        uint256 mintPrice_
     ) ERC721(name_, symbol_) {
         setMerkleRoot(merkleRoot_);
         setBaseURI(baseURI_);
+        setMintPrice(mintPrice_);
     }
 
     function mint(bytes32[] calldata merkleProof) external payable {
         require(_isMinter(msg.sender, merkleProof), "Not a valid minter");
         require(balanceOf(msg.sender) == 0, "Only one token is allowed");
-        uint256 mintPrice = _mintPrice();
         require(msg.value >= mintPrice, "Insufficient payment for minting");
 
         __mint(msg.sender);
@@ -44,12 +46,6 @@ contract NonTransferrableERC721 is ERC721URIStorage, Ownable {
             bytes.concat(keccak256(abi.encode(minter, 1)))
         );
         return MerkleProof.verify(merkleProof, merkleRoot, leaf);
-    }
-
-    // TODO: to be customized or even set by owner later
-    function _mintPrice() internal view returns (uint256) {
-        // 10 MATIC on Polygon or 0.1eth
-        return (block.chainid == 137) ? 10 ether : 0.1 ether;
     }
 
     function mintByOwner(address to) external onlyOwner {
@@ -103,6 +99,10 @@ contract NonTransferrableERC721 is ERC721URIStorage, Ownable {
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
+    }
+
+    function setMintPrice(uint256 mintPrice_) public onlyOwner {
+        mintPrice = mintPrice_;
     }
 
     function _getNextTokenId() private view returns (uint256) {

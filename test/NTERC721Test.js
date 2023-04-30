@@ -21,7 +21,8 @@ describe("NTERC721 Test", function () {
             "Non-transferrable NFT",
             "NTERC721",
             merkleRoot,
-            "ipfs://example.com/token/"
+            "ipfs://example.com/token/",
+            ethers.utils.parseEther("0.1")
         );
         await contract.deployed();
 
@@ -94,10 +95,11 @@ describe("NTERC721 Test", function () {
     });
 
     describe("setMerkleRoot function", () => {
-        const anotherMerkleRoot = "0x2b6c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918700";
+        const anotherMerkleRoot = "0x006c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918700";
 
         it("should set a merkle root if it's the contract owner", async () => {
             await contract.setMerkleRoot(anotherMerkleRoot);
+            expect(await contract.merkleRoot()).to.equal(anotherMerkleRoot);
         });
 
         it("should not set a merkle root if it's not the contract owner", async () => {
@@ -122,4 +124,18 @@ describe("NTERC721 Test", function () {
         });
     });
 
+    describe("setMintPrice function", () => {
+        const newMintPrice = ethers.utils.parseEther("0.2");
+
+        it("should set a new mint price if it's the contract owner", async () => {
+            await contract.setMintPrice(newMintPrice);
+            expect(await contract.mintPrice()).to.equal(newMintPrice);
+        });
+
+        it("should not set a new mint price if it's the contract owner", async () => {
+            await expect(
+                contract.connect(addr1).setMintPrice(newMintPrice)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+    });
 });

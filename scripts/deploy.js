@@ -1,9 +1,9 @@
 const ethers = require("ethers");
 const artifact = require("../artifacts/contracts/NTERC721.sol/NonTransferrableERC721.json");
 require("dotenv").config();
-const { program, Option } = require('commander');
+const { program, Option } = require("commander");
 
-async function main(name, symbol, merkleRoot, baseURI) {
+async function deploy(name, symbol, merkleRoot, baseURI, mintPrice) {
     const privateKey = process.env.PRIVATE_KEY ?? "";
     if (privateKey === "") {
         throw new Error("PRIVATE_KEY should be set in .env");
@@ -22,7 +22,13 @@ async function main(name, symbol, merkleRoot, baseURI) {
         artifact.bytecode,
         signer
     );
-    const contract = await factory.deploy(name, symbol, merkleRoot, baseURI);
+    const contract = await factory.deploy(
+        name,
+        symbol,
+        merkleRoot,
+        baseURI,
+        ethers.utils.parseEther(mintPrice)
+    );
     console.log("tx hash:", contract.deployTransaction.hash);
     await contract.deployed();
     console.log("Contract deployment completed");
@@ -53,12 +59,22 @@ program
             "Token's base URI"
         ).makeOptionMandatory()
     )
+    .addOption(
+        new Option(
+            "-p --mintPrice <string>",
+            "Mint price (in ETH)"
+        ).makeOptionMandatory()
+    )
     .parse();
 const options = program.opts();
 
-main(options.name, options.symbol, options.merkleRoot, options.baseUri).catch(
-    (err) => {
-        console.error(err);
-        process.exitCode = 1;
-    }
-);
+deploy(
+    options.name,
+    options.symbol,
+    options.merkleRoot,
+    options.baseUri,
+    options.mintPrice
+).catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+});
