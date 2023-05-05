@@ -82,7 +82,10 @@ describe("NTERC721 Test", function () {
 
         it("should burn a token if it's the token owner", async () => {
             await contract.mintByOwner(addr1.address);
-            await expect(contract.connect(addr1).burn(2)).to.emit(contract, "Transfer");
+            await expect(contract.connect(addr1).burn(2)).to.emit(
+                contract,
+                "Transfer"
+            );
             expect(await contract.balanceOf(addr1.address)).to.equal(0);
         });
 
@@ -95,7 +98,8 @@ describe("NTERC721 Test", function () {
     });
 
     describe("setMerkleRoot function", () => {
-        const anotherMerkleRoot = "0x006c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918700";
+        const anotherMerkleRoot =
+            "0x006c5728b75c3f5862a7e18129a3fd7a9808b0fcbe51599e90f52b110c918700";
 
         it("should set a merkle root if it's the contract owner", async () => {
             await contract.setMerkleRoot(anotherMerkleRoot);
@@ -114,10 +118,12 @@ describe("NTERC721 Test", function () {
 
         it("should set a base URI if it's the contract owner", async () => {
             await contract.setBaseURI(anotherBaseUri);
-            expect(await contract.tokenURI(1)).to.equal("https://example.com/metadata/1.json");
+            expect(await contract.tokenURI(1)).to.equal(
+                "https://example.com/metadata/1.json"
+            );
         });
 
-        it("should not set a base URI if it's the contract owner", async () => {
+        it("should not set a base URI if it's not the contract owner", async () => {
             await expect(
                 contract.connect(addr1).setBaseURI(anotherBaseUri)
             ).to.be.revertedWith("Ownable: caller is not the owner");
@@ -132,10 +138,34 @@ describe("NTERC721 Test", function () {
             expect(await contract.mintPrice()).to.equal(newMintPrice);
         });
 
-        it("should not set a new mint price if it's the contract owner", async () => {
+        it("should not set a new mint price if it's not the contract owner", async () => {
             await expect(
                 contract.connect(addr1).setMintPrice(newMintPrice)
             ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+    });
+
+    describe("withdraw function", () => {
+        it("should withdraw the balance to the owner", async () => {
+            const balanceBeforeWithdrawl = await owner.getBalance();
+            const contractBalance = await owner.provider.getBalance(
+                contract.address
+            );
+            const tx = await contract.withdraw();
+            const receipt = await tx.wait();
+            const gasCost = receipt.gasUsed.mul(tx.gasPrice);
+            expect(await owner.provider.getBalance(contract.address)).to.equal(
+                0
+            );
+            expect(await owner.getBalance()).to.equal(
+                balanceBeforeWithdrawl.add(contractBalance).sub(gasCost)
+            );
+        });
+
+        it("should not withdraw if it's not the contract owner", async () => {
+            await expect(contract.connect(addr1).withdraw()).to.be.revertedWith(
+                "Ownable: caller is not the owner"
+            );
         });
     });
 });

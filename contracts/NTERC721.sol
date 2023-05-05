@@ -83,6 +83,11 @@ contract NonTransferrableERC721 is ERC721URIStorage, Ownable {
         super.safeTransferFrom(from, to, tokenId);
     }
 
+    function withdraw() public onlyOwner {
+        address payable owner = payable(owner());
+        owner.transfer(address(this).balance);
+    }
+
     function setMerkleRoot(bytes32 merkleRoot_) public onlyOwner {
         merkleRoot = merkleRoot_;
     }
