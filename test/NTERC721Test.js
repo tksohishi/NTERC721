@@ -30,11 +30,14 @@ describe("NTERC721 Test", function () {
         await contract.connect(owner).mint(proofForOwner, {
             value: ethers.utils.parseEther("0.1"),
         });
-
-        expect(await contract.ownerOf(1)).to.equal(owner.address);
     });
 
     describe("mint function", () => {
+        it("should mint a token to the owner", async () => {
+            // In beforeEach, a token is already minted
+            expect(await contract.ownerOf(1)).to.equal(owner.address);
+        });
+
         it("should not mint another token to the owner", async () => {
             await expect(
                 contract.connect(owner).mint(proofForOwner, {

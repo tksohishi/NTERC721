@@ -3,15 +3,26 @@ const artifact = require("../artifacts/contracts/NTERC721.sol/NonTransferrableER
 require("dotenv").config();
 const { program, Option } = require("commander");
 
-async function deploy(name, symbol, merkleRoot, baseURI, mintPrice) {
+async function deploy(name, symbol, merkleRoot, baseURI, mintPrice, network) {
     const privateKey = process.env.PRIVATE_KEY ?? "";
     if (privateKey === "") {
         throw new Error("PRIVATE_KEY should be set in .env");
     }
-    const rpcUrl = process.env.MUMBAI_RPC_URL ?? "";
+
+    let rpcUrl = "";
+    if (network === "polygonMumbai") {
+        rpcUrl = process.env.MUMBAI_RPC_URL;
+    } else if (network === "arbitrumGoerli") {
+        rpcUrl = process.env.ARBITRUM_GOERLI_RPC_URL;
+    } else if (network === "arbitrumOne") {
+        rpcUrl = process.env.ARBITRUM_RPC_URL;
+    } else if (network === "polygon") {
+        rpcUrl = process.env.POLYGON_RPC_URL;
+    }
+
     if (rpcUrl === "") {
         throw new Error(
-            "No value set for environement variable MUMBAI_RPC_URL"
+            "No value set for env variables on the specified network"
         );
     }
 
@@ -22,6 +33,7 @@ async function deploy(name, symbol, merkleRoot, baseURI, mintPrice) {
         artifact.bytecode,
         signer
     );
+
     const contract = await factory.deploy(
         name,
         symbol,
@@ -65,6 +77,9 @@ program
             "Mint price (in ETH)"
         ).makeOptionMandatory()
     )
+    .addOption(
+        new Option("-nw --network <string>", "Network").makeOptionMandatory()
+    )
     .parse();
 const options = program.opts();
 
@@ -73,7 +88,8 @@ deploy(
     options.symbol,
     options.merkleRoot,
     options.baseUri,
-    options.mintPrice
+    options.mintPrice,
+    options.network
 ).catch((err) => {
     console.error(err);
     process.exitCode = 1;
