@@ -14,13 +14,19 @@ module.exports = {
     },
     etherscan: {
         apiKey: {
+            sepolia: process.env.ETHERSCAN_API_KEY,
             polygon: process.env.POLYGONSCAN_API_KEY,
             polygonMumbai: process.env.POLYGONSCAN_API_KEY,
             arbitrumGoerli: process.env.ARBISCAN_API_KEY,
             arbitrumOne: process.env.ARBISCAN_API_KEY,
         },
     },
+    defaultNetwork: 'sepolia',
     networks: {
+        sepolia: {
+            url: process.env.SEPOLIA_RPC_URL ?? 'https://rpc2.sepolia.org',
+            accounts: [process.env.PRIVATE_KEY],
+        },
         polygon: {
             url: process.env.POLYGON_RPC_URL ?? 'https://polygon-rpc.com',
             accounts: [process.env.PRIVATE_KEY],

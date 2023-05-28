@@ -2,32 +2,21 @@ const ethers = require("ethers");
 const artifact = require("../artifacts/contracts/NTERC721.sol/NonTransferrableERC721.json");
 require("dotenv").config();
 const { program, Option } = require("commander");
+const hre = require("hardhat");
 
 async function deploy(name, symbol, merkleRoot, baseURI, mintPrice, network) {
-    const privateKey = process.env.PRIVATE_KEY ?? "";
-    if (privateKey === "") {
-        throw new Error("PRIVATE_KEY should be set in .env");
-    }
-
-    let rpcUrl = "";
-    if (network === "polygonMumbai") {
-        rpcUrl = process.env.MUMBAI_RPC_URL;
-    } else if (network === "arbitrumGoerli") {
-        rpcUrl = process.env.ARBITRUM_GOERLI_RPC_URL;
-    } else if (network === "arbitrumOne") {
-        rpcUrl = process.env.ARBITRUM_RPC_URL;
-    } else if (network === "polygon") {
-        rpcUrl = process.env.POLYGON_RPC_URL;
-    }
-
-    if (rpcUrl === "") {
-        throw new Error(
-            "No value set for env variables on the specified network"
+    let networkConfig = network ? hre.config.networks[network] : undefined;
+    if (networkConfig) {
+        console.log(`Deploying a contract on "${network}`);
+    } else {
+        networkConfig = hre.config.networks[hre.config.defaultNetwork];
+        console.log(
+            `Deploying a contract on the default network, ${hre.config.defaultNetwork}`
         );
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    const signer = new ethers.Wallet(privateKey, provider);
+    const provider = new ethers.providers.JsonRpcProvider(networkConfig.url);
+    const signer = new ethers.Wallet(networkConfig.accounts[0], provider);
     const factory = new ethers.ContractFactory(
         artifact.abi,
         artifact.bytecode,
@@ -47,39 +36,15 @@ async function deploy(name, symbol, merkleRoot, baseURI, mintPrice, network) {
 }
 
 program
-    .addOption(
-        new Option(
-            "-n --name <string>",
-            "name of token (e.g. bitcoin)"
-        ).makeOptionMandatory()
+    .requiredOption("-n --name <string>", "name of token")
+    .requiredOption("-s --symbol <string>", "symbol of token")
+    .requiredOption(
+        "-r --merkleRoot <string>",
+        "Merkle root to verify a tx's sender"
     )
-    .addOption(
-        new Option(
-            "-s --symbol <string>",
-            "symbol of token (e.g. BTC)"
-        ).makeOptionMandatory()
-    )
-    .addOption(
-        new Option(
-            "-r --merkleRoot <string>",
-            "Merkle root to verify a tx's sender"
-        ).makeOptionMandatory()
-    )
-    .addOption(
-        new Option(
-            "-u --baseUri <string>",
-            "Token's base URI"
-        ).makeOptionMandatory()
-    )
-    .addOption(
-        new Option(
-            "-p --mintPrice <string>",
-            "Mint price (in ETH)"
-        ).makeOptionMandatory()
-    )
-    .addOption(
-        new Option("-nw --network <string>", "Network").makeOptionMandatory()
-    )
+    .requiredOption("-u --baseUri <string>", "Token's base URI")
+    .requiredOption("-p --mintPrice <string>", "Mint price (in ETH)")
+    .option("-nw --network <string>", "Network")
     .parse();
 const options = program.opts();
 
