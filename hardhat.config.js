@@ -1,6 +1,8 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+const privateKey = process.env.PRIVATE_KEY;
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
     solidity: {
@@ -21,27 +23,26 @@ module.exports = {
             arbitrumOne: process.env.ARBISCAN_API_KEY,
         },
     },
-    defaultNetwork: 'sepolia',
     networks: {
         sepolia: {
             url: process.env.SEPOLIA_RPC_URL ?? 'https://rpc2.sepolia.org',
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [privateKey],
         },
         polygon: {
             url: process.env.POLYGON_RPC_URL ?? 'https://polygon-rpc.com',
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [privateKey],
         },
         polygonMumbai: {
             url: process.env.MUMBAI_RPC_URL ?? 'https://rpc.ankr.com/polygon_mumbai',
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [privateKey],
         },
         arbitrumOne: {
             url: process.env.ARBITRUM_RPC_URL ?? 'https://arb1.arbitrum.io/rpc',
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [privateKey],
         },
         arbitrumGoerli: {
             url: process.env.ARBITRUM_GOERLI_RPC_URL ?? 'https://goerli-rollup.arbitrum.io/rpc',
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [privateKey],
         },
     },
 };
