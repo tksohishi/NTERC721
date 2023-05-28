@@ -22,19 +22,19 @@ module.exports = {
     },
     networks: {
         polygon: {
-            url: process.env.POLYGON_RPC_URL,
+            url: process.env.POLYGON_RPC_URL ?? 'https://polygon-rpc.com',
             accounts: [process.env.PRIVATE_KEY],
         },
         polygonMumbai: {
-            url: process.env.MUMBAI_RPC_URL,
+            url: process.env.MUMBAI_RPC_URL ?? 'https://rpc.ankr.com/polygon_mumbai',
             accounts: [process.env.PRIVATE_KEY],
         },
         arbitrumOne: {
-            url: process.env.ARBITRUM_RPC_URL,
+            url: process.env.ARBITRUM_RPC_URL ?? 'https://arb1.arbitrum.io/rpc',
             accounts: [process.env.PRIVATE_KEY],
         },
         arbitrumGoerli: {
-            url: process.env.ARBITRUM_GOERLI_RPC_URL,
+            url: process.env.ARBITRUM_GOERLI_RPC_URL ?? 'https://goerli-rollup.arbitrum.io/rpc',
             accounts: [process.env.PRIVATE_KEY],
         },
     },
