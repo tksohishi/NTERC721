@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-contract NonTransferrableERC721 is ERC721, Ownable {
+contract NTERC721 is ERC721, Ownable {
     string public baseURI;
     bytes32 public merkleRoot;
     uint256 public mintPrice;

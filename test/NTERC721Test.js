@@ -14,7 +14,7 @@ describe("NTERC721 Test", function () {
     ];
 
     beforeEach(async () => {
-        Contract = await ethers.getContractFactory("NonTransferrableERC721");
+        Contract = await ethers.getContractFactory("NTERC721");
         [owner, addr1, addr2] = await ethers.getSigners();
 
         contract = await Contract.deploy(

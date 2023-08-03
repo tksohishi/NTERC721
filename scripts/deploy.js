@@ -1,5 +1,5 @@
 const ethers = require("ethers");
-const artifact = require("../artifacts/contracts/NTERC721.sol/NonTransferrableERC721.json");
+const artifact = require("../artifacts/contracts/NTERC721.sol/NTERC721.json");
 require("dotenv").config();
 const { program, Option } = require("commander");
 const hre = require("hardhat");
@@ -7,7 +7,7 @@ const hre = require("hardhat");
 async function deploy(name, symbol, merkleRoot, baseURI, mintPrice, network) {
     let networkConfig = network ? hre.config.networks[network] : undefined;
     if (networkConfig) {
-        console.log(`Deploying a contract on "${network}`);
+        console.log(`Deploying a contract on ${network}`);
     } else {
         networkConfig = hre.config.networks[hre.config.defaultNetwork];
         console.log(
@@ -56,6 +56,6 @@ deploy(
     options.mintPrice,
     options.network
 ).catch((err) => {
-    console.error(err);
+    console.error(err.reason, err.body);
     process.exitCode = 1;
 });
